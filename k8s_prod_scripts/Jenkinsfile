@@ -11,13 +11,13 @@ pipeline {
         NODE_PORT = '30088'
         DB_PASSWORD = '1234'
         DB_NAME_MYSQL = 'myapplication'
-        # ✅ Kubeconfig path directly on Jenkins server
+        //  Kubeconfig path directly on Jenkins server
         KUBECONFIG = '/home/jenkins/kubeconfig_for_jenkins/kubeconfig.yaml'
     }
 
     parameters {
         choice(name: 'ACTION', choices: ['deploy', 'remove'], description: 'Choose to deploy or remove resources')
-        booleanParam(name: 'DEPLOY_APP', defaultValue: true, description: 'Deploy Spring Boot app?')
+        // booleanParam(name: 'DEPLOY_APP', defaultValue: true, description: 'Deploy Spring Boot app?')
     }
 
     stages {
@@ -61,7 +61,7 @@ pipeline {
             when {
                 allOf {
                     expression { params.ACTION == 'deploy' }
-                    expression { params.DEPLOY_APP == true }
+                    // expression { params.DEPLOY_APP == true }
                 }
             }
             steps {
@@ -76,7 +76,7 @@ pipeline {
             when {
                 allOf {
                     expression { params.ACTION == 'deploy' }
-                    expression { params.DEPLOY_APP == true }
+                    // expression { params.DEPLOY_APP == true }
                 }
             }
             steps {
@@ -97,7 +97,7 @@ pipeline {
             when {
                 allOf {
                     expression { params.ACTION == 'remove' }
-                    expression { params.DEPLOY_APP == true }
+                    // expression { params.DEPLOY_APP == true }
                 }
             }
             steps {
