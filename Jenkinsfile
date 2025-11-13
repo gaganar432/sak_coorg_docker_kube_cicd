@@ -159,6 +159,18 @@ pipeline {
                 '''
             }
         }
+        stage('Remove target after Prod is completed') {
+            when {
+                allOf {
+                    expression { params.DEPLOY_ENV == 'prod' }
+                    expression { params.ACTION == 'remove' }
+                }
+            }
+            steps {
+                echo 'Removing Target Dir from the maven project'
+                sh 'mvn clean'
+            }
+        }
     }
     post {
         success {
