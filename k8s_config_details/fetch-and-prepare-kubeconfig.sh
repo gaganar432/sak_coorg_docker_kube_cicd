@@ -22,14 +22,13 @@ echo -e "${YELLOW}Please provide the following details:${NC}"
 read -rp "Enter the SSH user for control plane (default: ubuntu): " CONTROL_PLANE_USER
 CONTROL_PLANE_USER=${CONTROL_PLANE_USER:-ubuntu}
 
-read -rp "Enter the control plane PUBLIC IP (or PRIVATE IP if same VPC): " CONTROL_PLANE_IP
+read -rp "Enter the control plane PRIVATE IP: " CONTROL_PLANE_IP
 if [ -z "$CONTROL_PLANE_IP" ]; then
     log_error "Control plane IP cannot be empty!"
     exit 1
 fi
 
-read -rp "Enter path to PEM key file (default: /root/sak.pem): " PEM_KEY_PATH
-PEM_KEY_PATH=${PEM_KEY_PATH:-/root/sak.pem}
+read -rp "Enter PEM_KEY_FILE name from /root/PEM_KEY_FILE (default: /root/sak.pem): " PEM_KEY_PATH
 
 # ---------------------------- Validate PEM Key --------------------------------
 if [ ! -f "$PEM_KEY_PATH" ]; then
@@ -111,12 +110,17 @@ fi
 log_info "Setting secure permissions and ownership for kubeconfig..."
 sudo chown jenkins:jenkins "$LOCAL_KUBECONFIG"
 sudo chmod 600 "$LOCAL_KUBECONFIG"
+
+# Added redundant hardening (ensures ownership and perms are correct)
+sudo chown jenkins:jenkins /home/jenkins/kubeconfig_for_jenkins/kubeconfig.yaml
+sudo chmod 600 /home/jenkins/kubeconfig_for_jenkins/kubeconfig.yaml
+
 log_success "Ownership set to jenkins:jenkins and permissions to 600."
 
 # ---------------------------- Test Cluster Connectivity -----------------------
 export KUBECONFIG="$LOCAL_KUBECONFIG"
 log_info "Testing kubectl connectivity..."
-if sudo -u jenkins kubectl get nodes &>/dev/null; then
+if sudo -u jenkins kubectl --kubeconfig="$LOCAL_KUBECONFIG" get nodes &>/dev/null; then
     log_success "Kubectl successfully connected to the cluster!"
 else
     log_error "Kubectl cannot connect to the cluster. Check IP, security groups, or cluster status!"
@@ -134,4 +138,5 @@ echo "================================================================"
 
 ################################################################################
 # End of Script
+# Designed and Developed by: sak_shetty
 ################################################################################
